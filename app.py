@@ -60,7 +60,7 @@ vibe = st.selectbox("Tone / Focus", [
 keywords_clean = keywords.strip()
 hashtags_clean = hashtags.strip()
 
-lines_overhead = 4 if (keywords_clean and hashtags_clean) else 2
+lines_overhead = 3 if (keywords_clean and hashtags_clean) else 1
 suffix_length = len(keywords_clean) + len(hashtags_clean) + lines_overhead
 max_post_length = max(50, 280 - suffix_length)
 
