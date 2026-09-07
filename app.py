@@ -39,7 +39,7 @@ if st.button("🔥 Generate X Captions", type="primary"):
         with st.spinner("Processing transcript with Gemini..."):
             try:
                 genai.configure(api_key=api_key.strip())
-                model = genai.GenerativeModel("gemini-2.5-flash")
+                model = genai.GenerativeModel("gemini-3.6-flash")
 
                 clean_context = transcript_input[:8000]
 
