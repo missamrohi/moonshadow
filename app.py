@@ -39,8 +39,15 @@ if st.button("🔥 Generate X Captions", type="primary"):
         with st.spinner("Processing transcript with Gemini..."):
             try:
                 genai.configure(api_key=api_key.strip())
-                model = genai.GenerativeModel("gemini-1.5-flash")
+                #model = genai.GenerativeModel("gemini-1.5-flash")
+                
+                # Automatically picks an available Flash model under your API key
+                available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+                selected_model = next((m for m in available_models if "flash" in m), "models/gemini-2.5-flash")
 
+                model = genai.GenerativeModel(selected_model)
+                
+                
                 clean_context = transcript_input[:8000]
 
                 prompt = f"""
