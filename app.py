@@ -56,11 +56,11 @@ vibe = st.selectbox("Tone / Focus", [
 
 # --- DYNAMIC CHARACTER LIMIT CALCULATION ---
 # Total X limit = 280 chars.
-# We deduct lengths of keywords, hashtags, and 4 newlines (\n\n between sections)
+# Overhead: 2 newlines before keywords, 1 newline before hashtags
 keywords_clean = keywords.strip()
 hashtags_clean = hashtags.strip()
 
-lines_overhead = 3 if (keywords_clean and hashtags_clean) else 1
+lines_overhead = 3 if (keywords_clean and hashtags_clean) else 2
 suffix_length = len(keywords_clean) + len(hashtags_clean) + lines_overhead
 max_post_length = max(50, 280 - suffix_length)
 
@@ -82,7 +82,7 @@ if st.button("🔥 Generate 10 X Captions", type="primary"):
         with st.spinner("Crafting 10 tweets..."):
             try:
                 clean_context = transcript_input[:5000].strip()
-                model = genai.GenerativeModel("gemini-3.6-flash")
+                model = genai.GenerativeModel("gemini-2.5-flash")
 
                 # 3. FANDOM-SPECIFIC & PROMPT INJECTION GUARDED PROMPT
                 prompt = f"""
@@ -118,19 +118,27 @@ if st.button("🔥 Generate 10 X Captions", type="primary"):
                 st.subheader("🎉 Ready-to-Post Captions (10 Options)")
 
                 for idx, caption_text in enumerate(captions, 1):
-                    # Construct full formatted tweet with line breaks
-                    tweet_parts = [caption_text.strip()]
+                    # Construct full formatted tweet:
+                    # - Double line break between post and keywords
+                    # - Single line break between keywords and hashtag
+                    suffix_parts = []
                     if keywords_clean:
-                        tweet_parts.append(keywords_clean)
+                        suffix_parts.append(keywords_clean)
                     if hashtags_clean:
-                        tweet_parts.append(hashtags_clean)
+                        suffix_parts.append(hashtags_clean)
                     
-                    full_tweet = "\n\n".join(tweet_parts)
+                    suffix = "\n".join(suffix_parts)
+                    
+                    if suffix:
+                        full_tweet = f"{caption_text.strip()}\n\n{suffix}"
+                    else:
+                        full_tweet = caption_text.strip()
 
                     st.markdown(f"**Option #{idx}** ({len(full_tweet)} / 280 chars)")
                     
-                    # Code block displays formatting cleanly for copy-paste
-                    st.code(full_tweet, language=None)
+                    # Wrapped container ensures clean text wrapping without horizontal scrolling
+                    with st.container(border=True):
+                        st.text(full_tweet)
                     
                     # Direct URL encoding preserves \n line breaks on X
                     encoded_tweet = urllib.parse.quote(full_tweet)
