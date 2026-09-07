@@ -36,25 +36,11 @@ if st.button("🔥 Generate X Captions", type="primary"):
     else:
         with st.spinner("Processing transcript with Gemini..."):
             try:
-                # 1. Configure the API key FIRST
+                # Configure API Key
                 genai.configure(api_key=api_key.strip())
 
-                # 2. Safely find an available model OR fall back to gemini-2.5-flash
-                selected_model = "gemini-2.5-flash"
-                try:
-                    available = [
-                        m.name for m in genai.list_models() 
-                        if 'generateContent' in m.supported_generation_methods
-                    ]
-                    # Find any available flash model in the account
-                    flash_model = next((m for m in available if "flash" in m), None)
-                    if flash_model:
-                        selected_model = flash_model
-                except Exception:
-                    # If listing models fails, use the primary current endpoint directly
-                    selected_model = "gemini-2.5-flash"
-
-                model = genai.GenerativeModel(selected_model)
+                # Set model to the latest active endpoint
+                model = genai.GenerativeModel("gemini-3.6-flash")
 
                 clean_context = transcript_input[:8000]
 
