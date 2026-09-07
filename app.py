@@ -10,7 +10,10 @@ st.title("🌙 Moonshadow YouTube Caption Generator")
 st.write("Paste YouTube transcript text below to generate ready-to-tweet posts!")
 
 # Sidebar API Key Input
-api_key = st.sidebar.text_input("Gemini API Key (Free)", type="password")
+# api_key = st.sidebar.text_input("Gemini API Key (Free)", type="password")
+
+# Fallback to secrets if sidebar text input is empty
+api_key = st.sidebar.text_input("Gemini API Key", type="password", value=st.secrets.get("GEMINI_API_KEY", ""))
 
 # Inputs
 transcript_input = st.text_area(
