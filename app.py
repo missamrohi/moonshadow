@@ -57,8 +57,10 @@ if st.button("🔥 Generate X Captions", type="primary"):
                 # 3. INPUT LIMIT: Truncate transcript length (5,000 chars max)
                 clean_context = transcript_input[:5000].strip()
 
-                # Model initialization
-                model = genai.GenerativeModel("gemini-1.5-flash")
+            
+                # Set model to the latest active endpoint
+                model = genai.GenerativeModel("gemini-3.6-flash")
+                
 
                 # 4. PROMPT INJECTION GUARD
                 prompt = f"""
