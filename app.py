@@ -82,7 +82,7 @@ if st.button("🔥 Generate 10 X Captions", type="primary"):
         with st.spinner("Crafting 10 tweets..."):
             try:
                 clean_context = transcript_input[:5000].strip()
-                model = genai.GenerativeModel("gemini-2.5-flash")
+                model = genai.GenerativeModel("gemini-3.6-flash")
 
                 # 3. FANDOM-SPECIFIC & PROMPT INJECTION GUARDED PROMPT
                 prompt = f"""
