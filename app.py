@@ -9,11 +9,9 @@ st.set_page_config(page_title="Moonshadow Generator", page_icon="🌙", layout="
 st.title("🌙 Moonshadow YouTube Caption Generator")
 st.write("Paste YouTube transcript text below to generate ready-to-tweet posts!")
 
-# Sidebar API Key Input
-# api_key = st.sidebar.text_input("Gemini API Key (Free)", type="password")
-
-# Fallback to secrets if sidebar text input is empty
-api_key = st.sidebar.text_input("Gemini API Key", type="password", value=st.secrets.get("GEMINI_API_KEY", ""))
+# Sidebar API Key Input (Prefilled with Streamlit Secret if available)
+default_key = st.secrets.get("GEMINI_API_KEY", "")
+api_key = st.sidebar.text_input("Gemini API Key", value=default_key, type="password")
 
 # Inputs
 transcript_input = st.text_area(
@@ -31,23 +29,33 @@ vibe = st.selectbox("Tone / Focus", [
 ])
 
 if st.button("🔥 Generate X Captions", type="primary"):
-    if not api_key:
-        st.error("Please enter your Gemini API key in the sidebar.")
+    if not api_key.strip():
+        st.error("Please enter your Gemini API key in the sidebar or save it in Streamlit Secrets.")
     elif not transcript_input.strip():
         st.warning("Please paste transcript text or context from the video.")
     else:
         with st.spinner("Processing transcript with Gemini..."):
             try:
+                # 1. Configure the API key FIRST
                 genai.configure(api_key=api_key.strip())
-                #model = genai.GenerativeModel("gemini-1.5-flash")
-                
-                # Automatically picks an available Flash model under your API key
-                available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-                selected_model = next((m for m in available_models if "flash" in m), "models/gemini-2.5-flash")
+
+                # 2. Safely find an available model OR fall back to gemini-2.5-flash
+                selected_model = "gemini-2.5-flash"
+                try:
+                    available = [
+                        m.name for m in genai.list_models() 
+                        if 'generateContent' in m.supported_generation_methods
+                    ]
+                    # Find any available flash model in the account
+                    flash_model = next((m for m in available if "flash" in m), None)
+                    if flash_model:
+                        selected_model = flash_model
+                except Exception:
+                    # If listing models fails, use the primary current endpoint directly
+                    selected_model = "gemini-2.5-flash"
 
                 model = genai.GenerativeModel(selected_model)
-                
-                
+
                 clean_context = transcript_input[:8000]
 
                 prompt = f"""
